@@ -76,6 +76,7 @@ def save_trips(source, destination, session=None):
                     try:
                         with archive.open(members[0]) as infile:
                             shutil.copyfileobj(infile, temp)
+                        temp.flush()
                         validate_trip_columns(temp_path)
                         os.replace(temp_path, destination)
                     finally:
