@@ -1,10 +1,11 @@
 import json
 import zipfile
-from datetime import date
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pytest
 
-from extract import save_trips, save_weather, validate_weather
+from extract import ARCHIVE_URL, FORECAST_URL, save_trips, save_weather, validate_weather
 
 
 HEADER = (
@@ -53,3 +54,25 @@ def test_saves_matching_weather(tmp_path):
 def test_rejects_weather_for_another_day():
     with pytest.raises(ValueError, match="no data"):
         validate_weather(weather_payload(), date(2024, 6, 2))
+
+
+@pytest.mark.parametrize("days_ago, endpoint", [(1, FORECAST_URL), (30, ARCHIVE_URL)])
+def test_uses_recent_or_historical_weather_api(tmp_path, days_ago, endpoint):
+    batch_date = datetime.now(ZoneInfo("America/New_York")).date() - timedelta(days=days_ago)
+    payload = weather_payload()
+    payload["daily"]["time"] = [batch_date.isoformat()]
+
+    class Response:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return payload
+
+    class Session:
+        def get(self, url, **kwargs):
+            assert url == endpoint
+            assert kwargs["params"]["timezone"] == "America/New_York"
+            return Response()
+
+    save_weather(batch_date, 40, -74, "America/New_York", tmp_path / "weather.json", session=Session())

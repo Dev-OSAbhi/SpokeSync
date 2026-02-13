@@ -6,9 +6,10 @@ import os
 import shutil
 import tempfile
 import zipfile
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlparse
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import requests
@@ -17,6 +18,7 @@ from urllib3.util.retry import Retry
 
 
 ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"
+FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 TRIP_COLUMNS = {
     "ride_id", "rideable_type", "started_at", "ended_at",
     "start_station_name", "start_station_id", "end_station_name",
@@ -114,16 +116,23 @@ def save_weather(batch_date, latitude, longitude, timezone, destination, weather
             payload = json.load(infile)
     else:
         session = session or session_with_retries()
+        today = datetime.now(ZoneInfo(timezone)).date()
+        if batch_date > today:
+            raise ValueError("Cannot extract weather for a future date")
+        recent = batch_date >= today - timedelta(days=7)
+        params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "daily": "temperature_2m_mean,precipitation_sum,weather_code",
+            "timezone": timezone,
+        }
+        if recent:
+            params.update(past_days=7, forecast_days=1)
+        else:
+            params.update(start_date=batch_date.isoformat(), end_date=batch_date.isoformat())
         response = session.get(
-            ARCHIVE_URL,
-            params={
-                "latitude": latitude,
-                "longitude": longitude,
-                "start_date": batch_date.isoformat(),
-                "end_date": batch_date.isoformat(),
-                "daily": "temperature_2m_mean,precipitation_sum,weather_code",
-                "timezone": timezone,
-            },
+            FORECAST_URL if recent else ARCHIVE_URL,
+            params=params,
             timeout=(10, 60),
         )
         response.raise_for_status()
