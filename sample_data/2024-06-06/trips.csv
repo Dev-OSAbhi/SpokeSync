@@ -1,0 +1,17 @@
+ride_id,rideable_type,started_at,ended_at,start_station_name,start_station_id,end_station_name,end_station_id,start_lat,start_lng,end_lat,end_lng,member_casual
+demo-20240606-000,classic_bike,2024-06-06 07:00:00,2024-06-06 07:12:00,Riverside,S1,Central,S4,40.72,-74.02,40.71,-74.0,casual
+demo-20240606-001,classic_bike,2024-06-06 08:01:00,2024-06-06 08:14:00,Hillcrest,S2,Market,S5,40.73,-74.01,40.7,-74.01,member
+demo-20240606-002,classic_bike,2024-06-06 09:02:00,2024-06-06 09:16:00,Parkside,S3,Central,S4,40.71,-74.03,40.71,-74.0,member
+demo-20240606-003,classic_bike,2024-06-06 07:03:00,2024-06-06 07:18:00,Riverside,S1,Market,S5,40.72,-74.02,40.7,-74.01,casual
+demo-20240606-004,classic_bike,2024-06-06 08:04:00,2024-06-06 08:20:00,Hillcrest,S2,Central,S4,40.73,-74.01,40.71,-74.0,member
+demo-20240606-005,classic_bike,2024-06-06 09:05:00,2024-06-06 09:22:00,Parkside,S3,Market,S5,40.71,-74.03,40.7,-74.01,member
+demo-20240606-006,classic_bike,2024-06-06 07:06:00,2024-06-06 07:24:00,Riverside,S1,Central,S4,40.72,-74.02,40.71,-74.0,casual
+demo-20240606-007,classic_bike,2024-06-06 08:07:00,2024-06-06 08:26:00,Hillcrest,S2,Market,S5,40.73,-74.01,40.7,-74.01,member
+demo-20240606-008,classic_bike,2024-06-06 09:08:00,2024-06-06 09:28:00,Parkside,S3,Central,S4,40.71,-74.03,40.71,-74.0,member
+demo-20240606-009,classic_bike,2024-06-06 07:09:00,2024-06-06 07:30:00,Riverside,S1,Market,S5,40.72,-74.02,40.7,-74.01,casual
+demo-20240606-010,classic_bike,2024-06-06 17:10:00,2024-06-06 17:32:00,Central,S4,Hillcrest,S2,40.71,-74.0,40.73,-74.01,member
+demo-20240606-011,classic_bike,2024-06-06 18:11:00,2024-06-06 18:34:00,Market,S5,Parkside,S3,40.7,-74.01,40.71,-74.03,member
+demo-20240606-012,classic_bike,2024-06-06 16:12:00,2024-06-06 16:36:00,Central,S4,Riverside,S1,40.71,-74.0,40.72,-74.02,casual
+demo-20240606-013,classic_bike,2024-06-06 17:13:00,2024-06-06 17:38:00,Market,S5,Hillcrest,S2,40.7,-74.01,40.73,-74.01,member
+demo-20240606-014,classic_bike,2024-06-06 18:14:00,2024-06-06 18:40:00,Central,S4,Parkside,S3,40.71,-74.0,40.71,-74.03,member
+demo-20240606-015,classic_bike,2024-06-06 16:15:00,2024-06-06 16:42:00,Market,S5,Riverside,S1,40.7,-74.01,40.72,-74.02,casual

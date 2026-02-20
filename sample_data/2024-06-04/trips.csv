@@ -1,0 +1,7 @@
+ride_id,rideable_type,started_at,ended_at,start_station_name,start_station_id,end_station_name,end_station_id,start_lat,start_lng,end_lat,end_lng,member_casual
+demo-20240604-000,classic_bike,2024-06-04 07:00:00,2024-06-04 07:12:00,Riverside,S1,Central,S4,40.72,-74.02,40.71,-74.0,casual
+demo-20240604-001,classic_bike,2024-06-04 08:01:00,2024-06-04 08:14:00,Hillcrest,S2,Market,S5,40.73,-74.01,40.7,-74.01,member
+demo-20240604-002,classic_bike,2024-06-04 09:02:00,2024-06-04 09:16:00,Parkside,S3,Central,S4,40.71,-74.03,40.71,-74.0,member
+demo-20240604-003,classic_bike,2024-06-04 07:03:00,2024-06-04 07:18:00,Riverside,S1,Market,S5,40.72,-74.02,40.7,-74.01,casual
+demo-20240604-004,classic_bike,2024-06-04 17:04:00,2024-06-04 17:20:00,Central,S4,Hillcrest,S2,40.71,-74.0,40.73,-74.01,member
+demo-20240604-005,classic_bike,2024-06-04 18:05:00,2024-06-04 18:22:00,Market,S5,Parkside,S3,40.7,-74.01,40.71,-74.03,member

@@ -1,0 +1,16 @@
+{
+  "daily": {
+    "time": [
+      "2024-06-03"
+    ],
+    "temperature_2m_mean": [
+      27
+    ],
+    "precipitation_sum": [
+      4.2
+    ],
+    "weather_code": [
+      61
+    ]
+  }
+}
