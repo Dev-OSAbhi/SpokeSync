@@ -43,5 +43,5 @@ CREATE TABLE IF NOT EXISTS fact_trips (
 CREATE INDEX IF NOT EXISTS fact_trips_date_idx ON fact_trips (date_key);
 CREATE INDEX IF NOT EXISTS fact_trips_start_station_time_idx ON fact_trips (start_station_id, started_at);
 CREATE INDEX IF NOT EXISTS fact_trips_end_station_time_idx ON fact_trips (end_station_id, ended_at);
-CREATE INDEX IF NOT EXISTS dim_date_calendar_date_idx ON dim_date (calendar_date);
-CREATE INDEX IF NOT EXISTS dim_weather_calendar_date_idx ON dim_weather (calendar_date);
+CREATE INDEX IF NOT EXISTS fact_trips_started_at_idx ON fact_trips (started_at);
+CREATE INDEX IF NOT EXISTS fact_trips_ended_at_idx ON fact_trips (ended_at);

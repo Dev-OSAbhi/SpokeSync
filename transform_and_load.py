@@ -76,8 +76,8 @@ def build_tables(spark, trips_path, weather_path, batch_date):
         .withColumn("station_name", F.coalesce(F.nullif(F.trim("station_name"), F.lit("")), "station_id"))
         .groupBy("station_id")
         .agg(F.max("station_name").alias("station_name"),
-             F.first("latitude", ignorenulls=True).alias("latitude"),
-             F.first("longitude", ignorenulls=True).alias("longitude"))
+             F.max("latitude").alias("latitude"),
+             F.max("longitude").alias("longitude"))
     )
 
     dates = (
