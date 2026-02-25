@@ -2,6 +2,7 @@
 
 import argparse
 import os
+from contextlib import closing
 from datetime import date
 from pathlib import Path
 
@@ -11,8 +12,8 @@ def build_tables(spark, trips_path, weather_path, batch_date):
 
     trips = spark.read.option("header", True).csv(str(trips_path))
     trips = (
-        trips.withColumn("started_at", F.to_timestamp("started_at"))
-        .withColumn("ended_at", F.to_timestamp("ended_at"))
+        trips.withColumn("started_at", F.to_timestamp_ntz("started_at"))
+        .withColumn("ended_at", F.to_timestamp_ntz("ended_at"))
         .filter(F.to_date("started_at") == F.lit(batch_date.isoformat()))
         .withColumn("start_station_id", F.trim("start_station_id"))
         .withColumn("end_station_id", F.trim("end_station_id"))
@@ -38,8 +39,8 @@ def build_tables(spark, trips_path, weather_path, batch_date):
         F.when(F.col("weather_code") == 0, "Clear")
         .when(F.col("weather_code").isin(1, 2, 3), "Cloudy")
         .when(F.col("weather_code").isin(45, 48), "Fog")
-        .when(F.col("weather_code").between(51, 67), "Rain")
-        .when(F.col("weather_code").between(71, 86), "Snow")
+        .when(F.col("weather_code").between(51, 67) | F.col("weather_code").isin(80, 81, 82), "Rain")
+        .when(F.col("weather_code").between(71, 77) | F.col("weather_code").isin(85, 86), "Snow")
         .when(F.col("weather_code") >= 95, "Thunderstorm")
         .otherwise("Other"),
     )
@@ -73,11 +74,12 @@ def build_tables(spark, trips_path, weather_path, batch_date):
     )
     stations = (
         starts.unionByName(ends)
-        .withColumn("station_name", F.coalesce(F.nullif(F.trim("station_name"), F.lit("")), "station_id"))
+        .withColumn("station_name", F.nullif(F.trim("station_name"), F.lit("")))
         .groupBy("station_id")
         .agg(F.max("station_name").alias("station_name"),
              F.max("latitude").alias("latitude"),
              F.max("longitude").alias("longitude"))
+        .withColumn("station_name", F.coalesce("station_name", "station_id"))
     )
 
     dates = (
@@ -125,13 +127,17 @@ TABLE_COLUMNS = {
 }
 
 
-def load_tables(tables, database_url, schema_path, batch_size=1000):
+def load_tables(tables, database_url, schema_path, batch_date, batch_size=1000):
     import psycopg2
     from psycopg2.extras import execute_values
 
-    with psycopg2.connect(database_url) as connection:
+    with closing(psycopg2.connect(database_url)) as connection, connection:
         with connection.cursor() as cursor:
             cursor.execute(Path(schema_path).read_text(encoding="utf-8"))
+            cursor.execute(
+                "DELETE FROM fact_trips WHERE date_key = %s",
+                (int(batch_date.strftime("%Y%m%d")),),
+            )
             for table, columns in TABLE_COLUMNS.items():
                 updates = ", ".join(f"{column} = EXCLUDED.{column}" for column in columns[1:])
                 statement = (
@@ -167,7 +173,7 @@ def main():
     try:
         tables = build_tables(spark, batch_dir / "trips.csv", batch_dir / "weather.json", args.batch_date)
         check_quality(tables)
-        load_tables(tables, args.database_url, args.schema)
+        load_tables(tables, args.database_url, args.schema, args.batch_date)
         print(f"Loaded bike-share batch {args.batch_date}")
     finally:
         spark.stop()

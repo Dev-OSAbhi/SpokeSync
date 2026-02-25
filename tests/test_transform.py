@@ -40,6 +40,8 @@ def test_builds_star_schema_for_one_day(spark, tmp_path):
     assert fact.date_key == 20240601
     assert fact.weather_key == 20240601
     assert float(fact.duration_minutes) == 12
+    assert fact.started_at.hour == 8
+    assert fact.ended_at.hour == 8
     assert tables["dim_date"].collect()[0].day_of_week == 6
     assert {row.station_id for row in tables["dim_station"].collect()} == {"a", "b"}
 

@@ -49,7 +49,7 @@ done
 streamlit run dashboard.py
 ```
 
-The loader creates tables from `data_model.sql` on its first run. Re-running a batch upserts its facts and dimensions by key, so the counts stay stable. To regenerate the sample and preview, run `python generate_demo.py`; Matplotlib is included in `requirements-dev.txt` for this purpose.
+The loader creates tables from `data_model.sql` on its first run. Re-running a batch replaces that day's facts in one transaction, so removed source rides do not linger. To regenerate the sample and preview, run `python generate_demo.py`; Matplotlib is included in `requirements-dev.txt` for this purpose.
 
 ## Run with public trip data
 

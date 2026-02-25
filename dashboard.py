@@ -1,6 +1,7 @@
 """Streamlit dashboard for the bike-share warehouse."""
 
 import os
+from contextlib import closing
 from datetime import timedelta
 
 import pandas as pd
@@ -13,12 +14,12 @@ STATION_SQL = """
 WITH morning_moves AS (
     SELECT start_station_id AS station_id, 1 AS departures, 0 AS arrivals
     FROM fact_trips
-    WHERE started_at::date BETWEEN %s AND %s
+    WHERE started_at >= %s::date AND started_at < (%s::date + INTERVAL '1 day')
       AND started_at::time >= TIME '07:00' AND started_at::time < TIME '10:00'
     UNION ALL
     SELECT end_station_id AS station_id, 0 AS departures, 1 AS arrivals
     FROM fact_trips
-    WHERE ended_at::date BETWEEN %s AND %s
+    WHERE ended_at >= %s::date AND ended_at < (%s::date + INTERVAL '1 day')
       AND ended_at::time >= TIME '07:00' AND ended_at::time < TIME '10:00'
 )
 SELECT s.station_id, s.station_name,
@@ -52,7 +53,7 @@ def query_frame(connection, sql, params):
 
 @st.cache_data(ttl=300, show_spinner=False)
 def available_dates():
-    with psycopg2.connect(os.environ["DATABASE_URL"]) as connection:
+    with closing(psycopg2.connect(os.environ["DATABASE_URL"])) as connection, connection:
         with connection.cursor() as cursor:
             cursor.execute("SELECT MIN(calendar_date), MAX(calendar_date) FROM dim_date")
             return cursor.fetchone()
@@ -60,7 +61,7 @@ def available_dates():
 
 @st.cache_data(ttl=300, show_spinner=False)
 def load_dashboard(start_date, end_date):
-    with psycopg2.connect(os.environ["DATABASE_URL"]) as connection:
+    with closing(psycopg2.connect(os.environ["DATABASE_URL"])) as connection, connection:
         stations = query_frame(connection, STATION_SQL, (start_date, end_date, start_date, end_date))
         daily = query_frame(connection, DAILY_SQL, (start_date, end_date))
     return stations, daily
@@ -122,24 +123,24 @@ def main():
             orientation="h", hover_data=["station_id", "departures", "arrivals"],
             labels={"net_outflow": "Net bike outflow", "station_name": "Station"},
         )
-        st.plotly_chart(chart, use_container_width=True)
+        st.plotly_chart(chart, width="stretch")
 
     st.subheader("Trips and weather")
     st.plotly_chart(px.line(daily, x="calendar_date", y="trips",
-                            labels={"calendar_date": "Date", "trips": "Trips"}), use_container_width=True)
+                            labels={"calendar_date": "Date", "trips": "Trips"}), width="stretch")
     left, right = st.columns(2)
     with left:
         st.plotly_chart(px.scatter(
             daily, x="precipitation_mm", y="trips", hover_data=["calendar_date"],
             labels={"precipitation_mm": "Precipitation (mm)", "trips": "Trips"},
             title="Rain and ridership",
-        ), use_container_width=True)
+        ), width="stretch")
     with right:
         st.plotly_chart(px.scatter(
             daily, x="temperature_c", y="trips", hover_data=["calendar_date"],
             labels={"temperature_c": "Mean temperature (°C)", "trips": "Trips"},
             title="Temperature and ridership",
-        ), use_container_width=True)
+        ), width="stretch")
     st.caption("Correlations describe the selected days; they do not establish a causal effect.")
 
 
