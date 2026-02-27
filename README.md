@@ -77,7 +77,3 @@ Set `DATABASE_URL` and `BIKE_TRIP_SOURCE_TEMPLATE` for the worker. The template 
 Spark drops rows with missing start or end station IDs. It rejects a batch with no trips, missing trip IDs, duplicate trip IDs, unmatched weather, or trip durations outside `(0, 1440)` minutes. These checks run before any warehouse write. PostgreSQL enforces primary keys, foreign keys, coordinate ranges, positive durations, and time order. Dimension rows load before facts; loading is batched and transactional. The dashboard shows the five stations with the largest positive net morning outflow and daily trip relationships with precipitation and mean temperature. Correlation is descriptive and can be unstable for short date ranges.
 
 Run tests with `python -m pytest -q`. Spark tests require PySpark and Java; without them, pytest skips those tests. The sample preview is synthetic and is not evidence of real-world demand or weather effects.
-
-## Data engineering skills shown
-
-The project uses Python and SQL for extraction, warehouse design, and loading; PySpark for large CSV transformation; explicit quality gates before loading; a dimensional star schema for analysis; Airflow for orchestration; and PostgreSQL indexes plus a Streamlit dashboard for reporting. These map to the Python, SQL, Spark, ETL, data modeling, quality, and orchestration requirements in the campus hire role described in the project plan.
